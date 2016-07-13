@@ -1,7 +1,5 @@
-import re
 import sys
 import json
-import pickle
 import random
 
 from keras.models import Sequential
@@ -12,65 +10,9 @@ from keras.utils.data_utils import get_file
 import h5py
 import numpy as np
 
+import data
 
-all_tweets = set()
-text = ""
-STX = u"\2"
-ETX = u"\3"
-UNK = u"\4"
-
-counter = 0
-maxlen = 40
-step = 3
-with open('tweets75k.pickle', 'rb') as f:
-    to_serialize = pickle.load(f)
-    for t in to_serialize:
-        try:
-            tweet = t['tweet']['text']
-        except:
-            tweet = t['tweet'].text
-
-        tweet = tweet.replace("RT ", "", 1).lower()
-        if len(tweet) < maxlen: continue # not a great input - trim it
-
-        tweet = tweet.replace("| rt ", "")
-        tweet = re.sub(r"http\S+[\W+]?", '', tweet) # remove links - they are not words
-        tweet = re.sub(r"[rt]?@\S+[\W+]?", '', tweet) # remove nicks - not a words either
-
-        tweet = tweet.strip()
-        tweet = STX + tweet + ETX
-        all_tweets.add(tweet)
-        text += tweet
-        counter += 1
-
-
-# print('\n'.join(all_tweets))
-# assert False
-
-chars = set(text)
-
-# remove extremas
-chars_frequncy = {}
-for c in  chars:
-    chars_frequncy[c] = 0
-
-for c in text:
-    chars_frequncy[c] += 1
-
-threshold = round(len(text) * 0.0005) # 0,05 % ? // why not
-
-text = ""
-tweets = []
-
-for t in all_tweets:
-    for c in set(t):
-        if chars_frequncy[c] <= threshold:
-            t = t.replace(c, UNK)
-    tweets.append(t)
-    text += t
-
-
-chars = set(text)
+tweets, text, chars = data.read('tweets75k.pickle')
 
 print('total chars:', len(chars))
 
@@ -78,6 +20,8 @@ char_indices = dict((c, i) for i, c in enumerate(chars))
 indices_char = dict((i, c) for i, c in enumerate(chars))
 
 # cut the text in semi-redundant sequences of maxlen characters
+step = 3
+maxlen = 40
 sentences = []
 next_chars = []
 for i in range(0, len(text) - maxlen, step):
@@ -149,7 +93,7 @@ def train(model, weights_in=None, weights_out=None):
 
                 generated = ''
 
-                sentence = random.choice(tweets)[:maxlen-1] + STX
+                sentence = random.choice(tweets)[:maxlen-1] + data.STX
                 #generated += sentence
                 print('----- Generating with seed: "' + sentence + '"')
                 sys.stdout.write(generated)
