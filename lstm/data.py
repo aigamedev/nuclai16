@@ -55,4 +55,4 @@ def read(filename, minlen=40, maxlen=None, padding=None):
 
     chars = set(text)
 
-    return (tweet, text, chars)
+    return (tweets, text, chars)
