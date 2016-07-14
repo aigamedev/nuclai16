@@ -1,8 +1,7 @@
 import os
 import sys
 import bootstrap     # Demonstration specific setup.
-# import scipy.misc               # Image loading and manipulation.
-import vispy.scene              # Canvas & visuals for rendering.
+import vispy.scene   # Canvas & visuals for rendering.
 import numpy
 
 import collections
@@ -24,7 +23,7 @@ COLOR_SELECTED = numpy.asarray([0.8,0.2,0.8])
 class Application(object):
 
 
-    def __init__(self, example_idx, title='nucl.ai16'): #, range=(0,850)):
+    def __init__(self, example_idx, title='nucl.ai Motion Matching'): #, range=(0,850)):
         self.canvas = vispy.scene.SceneCanvas(
                                 title=title,
                                 size=(1280, 720),
@@ -64,7 +63,7 @@ class Application(object):
 
         self.timer_toggle = True
         self.player_position = numpy.asarray([0,0])
-        self.paths_data = paths_data.PathsData(os.path.join('csv', 'data.csv'), self.params, follow_player=(example_idx == 3), advancing=(example_idx == 3 or example_idx == 2))
+        self.paths_data = paths_data.PathsData('dota2.csv', self.params, follow_player=(example_idx == 3), advancing=(example_idx == 3 or example_idx == 2))
         # init the searched point with some random value - after first mouse move it's a
         self.paths_data.mouse_xy = ( ( numpy.random.rand(2) * 10 - 5 ) - numpy.asarray(self.canvas.size) / 2 ) * self.params.SCALE_FACTOR
 
