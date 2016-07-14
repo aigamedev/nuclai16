@@ -12,7 +12,10 @@ import numpy as np
 
 import data
 
-tweets, text, chars = data.read('tweets75k.pickle')
+maxlen = 40
+
+# the minlen for tweet must be >= then maxlen defined for subsequences, otherwise we won't be able to build them.
+tweets, text, chars = data.read('tweets75k.pickle', minlen=maxlen)
 
 print('total chars:', len(chars))
 
@@ -21,7 +24,6 @@ indices_char = dict((i, c) for i, c in enumerate(chars))
 
 # cut the text in semi-redundant sequences of maxlen characters
 step = 3
-maxlen = 40
 sentences = []
 next_chars = []
 for i in range(0, len(text) - maxlen, step):
