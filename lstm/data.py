@@ -5,7 +5,7 @@ STX = u"\2"
 ETX = u"\3"
 UNK = u"\4"
 
-def read(filename, minlen=40, maxlen=None, padding=None):
+def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorten=False):
     all_tweets = set()
     text = ""
     with open(filename, 'rb') as f:
@@ -17,11 +17,20 @@ def read(filename, minlen=40, maxlen=None, padding=None):
                 tweet = t['tweet'].text
 
             tweet = tweet.replace("RT ", "", 1).lower()
-            tweet = tweet.replace("| rt ", "")
+            tweet = tweet.replace("rt, ", "", 1)
+            tweet = tweet.replace("| rt ", "", 1)
             tweet = re.sub(r"http\S+[\W+]?", '', tweet) # remove links - they are not words
-            tweet = re.sub(r"[rt]?@\S+[\W+]?", '', tweet) # remove nicks - not a words either
+            tweet = re.sub(r"[rt]?@\S+[\W+]?", '', tweet) # remove nicks - not a word
             tweet = tweet.strip()
             tweet = STX + tweet + ETX
+            if trim_hash: tweet = re.sub(r"#\S+[\W+]?", '', tweet) # remove hash - not a word
+            if shorten and len(tweet) > maxlen:
+                i = 1
+                tweet_shorten = tweet[:len("".join(tweet.split(".")[:i])) + i]
+                while len(tweet[:len("".join(tweet.split(".")[:i + 1])) + i ]) < maxlen:
+                    i += 1
+                    tweet_shorten = tweet[:len("".join(tweet.split(".")[:i])) + i]
+                tweet = tweet_shorten
             if len(tweet) < minlen: continue # not a great input - trim it
             if maxlen != None and len(tweet) > maxlen: continue # too long
             if padding:

@@ -8,10 +8,9 @@ from seq2seq.models import SimpleSeq2seq
 
 MAXLEN = 40
 
-tweets, text, chars = data.read('tweets75k.pickle', minlen=20, maxlen=MAXLEN, padding=" ")
+tweets, text, chars = data.read('tweets75k.pickle', minlen=20, maxlen=MAXLEN, padding=" ", trim_hash=True, shorten=True)
 chars_number = len(chars)
 tweets_number = len(tweets)
-
 
 model =  SimpleSeq2seq(input_dim=1, hidden_dim=12, output_length=8, output_dim=1, depth=1)
 model.compile(loss='mse', optimizer='rmsprop')
