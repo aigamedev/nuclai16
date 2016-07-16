@@ -5,13 +5,11 @@ import random
 
 class PathsData(object):
 
-    def __init__(self, data_file, params, follow_player = False, advancing = False):
+    def __init__(self, data_file, params):
 
         self.params = params
         self.data = {}
         self.user_team_lookup = {}
-        self.follow_player = follow_player
-        self.advancing = advancing
         # if advancing
         self.selected_path = []
         self.advance_point = 0
@@ -68,13 +66,7 @@ class PathsData(object):
             random_path = self.segments[hero_id][path_idx]
             append_path(random_path, path_idx, hero_id, self.params.MOVE_ALONG_STEP_SIZE, 0)
 
-        if  not self.advancing:
-            selected_paths.sort(key=lambda x: x[0]) # no memory - just return from here
-            return (selected_paths, new_path)
-
-        ## the code below is executed only if player advances the path
-
-        if self.advancing and len(self.selected_path):
+        if len(self.selected_path):
             self.advance_point += 1
             random_path = self.segments[self.selected_path[2]][self.selected_path[1]]
             investigated_point_idx = self.params.MOVE_ALONG_STEP_SIZE + self.advance_point
@@ -101,8 +93,7 @@ class PathsData(object):
             self.advance_point = 0
         else:
             # advance
-            if self.follow_player:
-                self.player_position = self.player_position + self.selected_path[4][self.advance_point][0:2] - self.selected_path[4][self.advance_point-1][0:2]
+            self.player_position = self.player_position + self.selected_path[4][self.advance_point][0:2] - self.selected_path[4][self.advance_point-1][0:2]
         self.selected_path = selected_paths[0]
         return (selected_paths, new_path)
 
