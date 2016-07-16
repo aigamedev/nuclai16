@@ -1,4 +1,5 @@
 import re
+import collections
 
 STX = u"\2"
 ETX = u"\3"
@@ -29,13 +30,7 @@ def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorte
     chars = set(text)
 
     # Remove extremely infrequent characters.
-    chars_frequncy = {}
-    for c in  chars:
-        chars_frequncy[c] = 0
-
-    for c in text:
-        chars_frequncy[c] += 1
-
+    chars_frequency = collections.Counter(text)
     threshold = round(len(text) * 0.0005) # 0,05%
 
     text = ""
@@ -44,11 +39,10 @@ def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorte
     # Replace unusual characters.
     for t in all_tweets:
         for c in set(t):
-            if chars_frequncy[c] <= threshold:
+            if chars_frequency[c] <= threshold:
                 t = t.replace(c, UNK)
         tweets.append(t)
         text += t
 
-    chars = set(text)
-
+    chars = sorted(list(set(text)))
     return (tweets, text, chars)
