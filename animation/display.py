@@ -12,10 +12,10 @@ import params
 
 # style
 SELECTED_PATH_WIDTH = 5
+HISTORY_PATH_WIDTH = 3
 PATH_WIDTH = 1
 SELECTED_ARROW_SIZE = 20.0
 ARROW_SIZE = 14.0
-
 # colors
 COLOR_NEUTRAL = numpy.asarray([0.5,0.5,0.5])
 COLOR_SELECTED = numpy.asarray([0.8,0.2,0.8])
@@ -39,6 +39,13 @@ class Application(object):
         self.lines = []
         self.vectors = []
         self.colors = []
+        self.history = []
+        self.history_pointer = 0
+        for i in range(self.params.HISTORY_SIZE):
+            line = vispy.scene.Line(parent=self.view.scene, color=COLOR_NEUTRAL, connect='strip', method='agg', width=HISTORY_PATH_WIDTH)
+            line.transform = vispy.visuals.transforms.MatrixTransform()
+            self.history.append(line)
+
         for i in range(self.params.TOP_PATHS_NUMBER):
             path_width = SELECTED_PATH_WIDTH if i == 0 else PATH_WIDTH
             arrow_size = SELECTED_ARROW_SIZE if i == 0 else ARROW_SIZE
@@ -103,7 +110,7 @@ class Application(object):
 
 
     def draw_vector(self, ev):
-        selected_paths = self.paths_data.get_paths()
+        selected_paths, _ = self.paths_data.get_paths()
         for i in range(self.params.TOP_PATHS_NUMBER):
             if i >= len(selected_paths):
                 # clear and skip
@@ -135,7 +142,7 @@ class Application(object):
 
 
     def draw_closest_with_team_vectors(self, ev):
-        selected_paths = self.paths_data.get_paths()
+        selected_paths, _ = self.paths_data.get_paths()
         for i in range(self.params.TOP_PATHS_NUMBER):
             if i >= len(selected_paths):
                 # clear and skip
@@ -178,8 +185,7 @@ class Application(object):
 
     def draw_current_path_advance(self, ev):
 
-        selected_paths = self.paths_data.get_paths()
-
+        selected_paths, new_path = self.paths_data.get_paths()
         for i in range(self.params.TOP_PATHS_NUMBER):
             if i >= len(selected_paths):
                 # clear and skip
@@ -193,9 +199,6 @@ class Application(object):
                 draw_to += self.paths_data.advance_point
                 #marker_point = current[self.paths_data.advance_point][0:2]
                 marker_point = selected_paths[i][3]
-                # append short history
-                if selected_paths[i][1] > 0 and len(self.paths_data.segments[selected_paths[i][2]][selected_paths[i][1] - 1]) > 0:
-                    current = numpy.concatenate((self.paths_data.segments[selected_paths[i][2]][selected_paths[i][1] - 1][-self.params.MOVE_ALONG_STEP_SIZE/3:], current))
 
             current = current[0:draw_to]
 
@@ -210,6 +213,19 @@ class Application(object):
                 self.marker.set_data(pos=numpy.asarray([marker_point]), face_color=self.colors[i], size=15)
                 self.marker.transform = self.lines[i].transform
 
+        if new_path:
+            # append history
+            self.history[self.history_pointer].transform.reset()
+            self.history[self.history_pointer].transform = vispy.visuals.transforms.MatrixTransform()
+            current = self.paths_data.previous_path[0][4][0:self.paths_data.previous_path[1]]
+            self.history[self.history_pointer].set_data(current[:,[0,1]])
+            self.history[self.history_pointer].transform.translate((self.paths_data.previous_path[0][3] * -1))
+            self.history[self.history_pointer].transform.translate(self.paths_data.previous_path[2])
+            self.history[self.history_pointer].transform.translate(numpy.asarray(self.canvas.size) / 2)
+            self.history_pointer += 1
+            if self.history_pointer == self.params.HISTORY_SIZE: self.history_pointer = 0
+
+
 
     def process(self, _):
         return
@@ -223,7 +239,7 @@ class Application(object):
             self.timer.connect(self.draw_closest_with_team_vectors)
         elif self.example_idx == 2 or self.example_idx == 3:
             self.timer.connect(self.draw_current_path_advance)
-        self.timer.start(0.5) # 30 FPS
+        self.timer.start(0.033) # 30 FPS
         vispy.app.run()
 
 

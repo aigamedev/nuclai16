@@ -17,6 +17,8 @@ class PathsData(object):
         self.advance_point = 0
         self.player_position = numpy.asarray([0,0])
 
+        self.previous_path = []
+
         for idx, row in enumerate(numpy.genfromtxt(data_file, delimiter=',')):
             if idx == 0: continue
             hero_id = int(row[1])
@@ -51,6 +53,7 @@ class PathsData(object):
         go_to = self.mouse_xy
         selected_paths = []
         player_point = self.player_position * self.params.SCALE_FACTOR
+        new_path = False
 
         def append_path(rendom_path, path_idx, hero_id, investigated_point_idx, path_advance):
             if len(random_path) and random_path[0][0] != random_path[-1][0] and random_path[0][1] != random_path[-1][1]:
@@ -67,7 +70,7 @@ class PathsData(object):
 
         if  not self.advancing:
             selected_paths.sort(key=lambda x: x[0]) # no memory - just return from here
-            return selected_paths
+            return (selected_paths, new_path)
 
         ## the code below is executed only if player advances the path
 
@@ -88,17 +91,20 @@ class PathsData(object):
         selected_paths.sort(key=lambda x: x[0])
         if len(self.selected_path) == 0 or selected_paths[0][1] != self.selected_path[1] or selected_paths[0][2] != self.selected_path[2]:
             # new path - reset
-            self.advance_point = 0
             if len(self.selected_path) > 0:
+                if self.advance_point > 1:
+                    self.previous_path = (self.selected_path, self.advance_point, self.player_position)
+                    new_path = True
                 for p_idx, p in enumerate(selected_paths):
                     if p[1] == self.selected_path[1] and p[2] == self.selected_path[2]:
                         selected_paths.pop(p_idx)
+            self.advance_point = 0
         else:
             # advance
             if self.follow_player:
                 self.player_position = self.player_position + self.selected_path[4][self.advance_point][0:2] - self.selected_path[4][self.advance_point-1][0:2]
         self.selected_path = selected_paths[0]
-        return selected_paths
+        return (selected_paths, new_path)
 
 
 
