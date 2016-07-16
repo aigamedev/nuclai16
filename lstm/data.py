@@ -1,4 +1,3 @@
-import pickle
 import re
 
 STX = u"\2"
@@ -8,21 +7,9 @@ UNK = u"\4"
 def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorten=False):
     all_tweets = set()
     text = ""
-    with open(filename, 'rb') as f:
-        to_serialize = pickle.load(f)
-        for t in to_serialize:
-            try:
-                tweet = t['tweet']['text']
-            except:
-                tweet = t['tweet'].text
-
-            tweet = tweet.replace("RT ", "", 1).lower()
-            tweet = tweet.replace("rt, ", "", 1)
-            tweet = tweet.replace("| rt ", "", 1)
-            tweet = re.sub(r"http\S+[\W+]?", '', tweet) # remove links - they are not words
-            tweet = re.sub(r"[rt]?@\S+[\W+]?", '', tweet) # remove nicks - not a word
-            tweet = tweet.strip()
-            tweet = STX + tweet + ETX
+    with open(filename, 'r', encoding='utf8') as f:
+        for t in f.readlines():
+            tweet = STX + t.strip() + ETX
             if trim_hash: tweet = re.sub(r"#\S+[\W+]?", '', tweet) # remove hash - not a word
             if shorten and len(tweet) > maxlen:
                 i = 1

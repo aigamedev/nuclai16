@@ -15,7 +15,7 @@ import data
 maxlen = 40
 
 # the minlen for tweet must be >= then maxlen defined for subsequences, otherwise we won't be able to build them.
-tweets, text, chars = data.read('tweets75k.pickle', minlen=maxlen)
+tweets, text, chars = data.read('tweets78k.txt', minlen=maxlen)
 
 print('total chars:', len(chars))
 
