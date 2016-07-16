@@ -2,7 +2,7 @@ import sys
 import json
 import random
 
-from keras.models import Sequential
+from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Activation, Dropout
 from keras.layers import LSTM
 from keras.utils.data_utils import get_file
@@ -45,7 +45,7 @@ def build_model(model_in=None, model_out=None):
     if model_in:
         print("Reading model...")
         with open(model_in, 'r') as model_file:
-            model = model_from_json(json_string)
+            model = model_from_json(model_file.read())
 
     else:
         # build the model: 2 stacked LSTM
@@ -57,12 +57,13 @@ def build_model(model_in=None, model_out=None):
         model.add(Dropout(0.2))
         model.add(Dense(len(chars)))
         model.add(Activation('softmax'))
-        model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
 
     if model_out:
         print("Saving model...")
         with open(model_out, 'w') as model_file:
-            json.dump(model.to_json(), model_file)
+            model_file.write(model.to_json())
 
     return model
 
