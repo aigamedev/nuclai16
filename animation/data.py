@@ -71,7 +71,7 @@ class Data(object):
             append_path(random_path, path_idx, hero_id, self.params.MOVE_ALONG_STEP_SIZE, 0)
 
         if len(self.selected_paths):
-            #self.advance_point += 1
+            # try to sample the current path by advancinf it
             random_path = self.segments[self.selected_paths[0][2]][self.selected_paths[0][1]]
             investigated_point_idx = self.params.MOVE_ALONG_STEP_SIZE + self.advance_point + 1
             if investigated_point_idx >= len(random_path):
@@ -82,9 +82,10 @@ class Data(object):
                     random_path = self.segments[self.selected_paths[0][2]][self.selected_paths[0][1] + segments_jump]
                     investigated_point_idx = investigated_point_idx % self.params.SEGMENT_SIZE
                 else:
-                    random_path = []
+                    random_path = [] # the path has ended, it empty
             append_path(random_path, self.selected_paths[0][1], self.selected_paths[0][2], investigated_point_idx, self.advance_point)
         selected_paths.sort(key=lambda x: x[0])
+
         if len(self.selected_paths) == 0 or selected_paths[0][1] != self.selected_paths[0][1] or selected_paths[0][2] != self.selected_paths[0][2]:
             # new path -
             # reset the pointer and keep the previous one to keep the history
