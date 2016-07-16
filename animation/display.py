@@ -112,18 +112,18 @@ class Application(object):
             current = self.data.selected_paths[i][4]
             draw_to = self.params.MOVE_ALONG_STEP_SIZE
 
-            if i == 0:
+            if i == 0: # i == 0 is the current / best scored path
                 draw_to += self.data.advance_point
                 marker_point = current[self.data.advance_point][0:2]
 
             current = current[0:draw_to]
             self.lines[i].set_data(pos=current[:,[0,1]])
-            if self.select:
+            if self.select: # in the selection the transorm must be updated
                 self.lines[i].transform.reset()
-                self.lines[i].transform.translate((self.data.selected_paths[i][3] * -1))
-                self.lines[i].transform.translate(self.data.player_position)
+                self.lines[i].transform.translate((self.data.selected_paths[i][3] * -1)) # path starting point
+                self.lines[i].transform.translate(self.data.player_position) # current player position
                 # to have [0,0] in the screen center
-                self.lines[i].transform.translate(numpy.asarray(self.canvas.size) / 2)
+                self.lines[i].transform.translate(numpy.asarray(self.canvas.size) / 2) # moving [0,0] to screen center
 
             if i == 0:
                 self.marker.set_data(pos=numpy.asarray([marker_point]), face_color=self.colors[i], size=15)
@@ -135,9 +135,9 @@ class Application(object):
             self.history[self.history_pointer].transform = vispy.visuals.transforms.MatrixTransform()
             current = self.data.previous_path[0][4][0:self.data.previous_path[1]]
             self.history[self.history_pointer].set_data(current[:,[0,1]])
-            self.history[self.history_pointer].transform.translate((self.data.previous_path[0][3] * -1))
-            self.history[self.history_pointer].transform.translate(self.data.previous_path[0][5])
-            self.history[self.history_pointer].transform.translate(numpy.asarray(self.canvas.size) / 2)
+            self.history[self.history_pointer].transform.translate((self.data.previous_path[0][3] * -1)) # path starting point
+            self.history[self.history_pointer].transform.translate(self.data.previous_path[0][5]) # the player position in the path
+            self.history[self.history_pointer].transform.translate(numpy.asarray(self.canvas.size) / 2) # moving [0,0] to screen center
             self.history_pointer += 1
             if self.history_pointer == self.params.HISTORY_SIZE: self.history_pointer = 0
 
