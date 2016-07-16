@@ -28,7 +28,7 @@ def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorte
 
     chars = set(text)
 
-    # remove extremas
+    # Remove extremely infrequent characters.
     chars_frequncy = {}
     for c in  chars:
         chars_frequncy[c] = 0
@@ -36,12 +36,12 @@ def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorte
     for c in text:
         chars_frequncy[c] += 1
 
-    threshold = round(len(text) * 0.0005) # 0,05 % ? // why not
+    threshold = round(len(text) * 0.0005) # 0,05%
 
     text = ""
     tweets = []
 
-    # replace unusual characters
+    # Replace unusual characters.
     for t in all_tweets:
         for c in set(t):
             if chars_frequncy[c] <= threshold:
