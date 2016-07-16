@@ -36,7 +36,6 @@ class Application(object):
         self.marker = vispy.scene.Markers(pos=numpy.asarray([[0,0]]), face_color='red', size=0, parent=self.view.scene)
         # prepare display
         self.lines = []
-        self.vectors = []
         self.colors = []
         self.history = []
         self.history_pointer = 0
@@ -49,22 +48,11 @@ class Application(object):
             path_width = SELECTED_PATH_WIDTH if i == 0 else PATH_WIDTH
             arrow_size = SELECTED_ARROW_SIZE if i == 0 else ARROW_SIZE
             color = COLOR_SELECTED if i == 0 else COLOR_NEUTRAL
-            vectors_line = []
             # color = numpy.random.rand(3) # using fixed colors now
             self.colors.append(color)
             line = vispy.scene.Line(parent=self.view.scene, color=color, connect='strip', method='agg', width=path_width)
             line.transform = vispy.visuals.transforms.MatrixTransform()
             self.lines.append(line)
-            for j in range(self.params.SEGMENT_SIZE):
-                if not self.params.VECTOR_POINT or self.params.VECTOR_POINT == j:
-                    arr1 = vispy.scene.Arrow(numpy.asarray([[0,0],[0,0]]), parent=self.view.scene, color=color, method='agg', arrow_size=arrow_size, width=path_width)
-                    arr1.transform = vispy.visuals.transforms.MatrixTransform()
-                    arr2 = vispy.scene.Arrow(numpy.asarray([[0,0],[0,0]]), parent=self.view.scene, color=color, method='agg', arrow_size=arrow_size, width=path_width)
-                    arr2.transform = arr1.transform
-                    self.marker.transform = arr1.transform
-                    vectors_line.append([arr1, arr2])
-                else: vectors_line.append([None, None])
-            self.vectors.append(vectors_line)
 
         self.timer_toggle = True
         self.player_position = numpy.asarray([0,0])
@@ -95,7 +83,7 @@ class Application(object):
         def on_resize(event):
             self.grid.transform.reset()
             self.grid.transform.translate(numpy.asarray(self.canvas.size) / 2)
-            # @TODO: translate paths and vectors
+            # @TODO: translate paths
 
 
         @self.canvas.events.mouse_move.connect

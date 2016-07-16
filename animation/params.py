@@ -7,5 +7,4 @@ class Params:
     HISTORY_SIZE = 100
 
     def __init__(self):
-        self.VECTOR_POINT = int(self.SEGMENT_SIZE / 2)
         self.MOVE_ALONG_STEP_SIZE = int(self.SEGMENT_SIZE / 2)
