@@ -1,9 +1,8 @@
-
 import numpy
 import math
 import random
 
-class PathsData(object):
+class Data(object):
 
     def __init__(self, data_file, params):
 
@@ -60,7 +59,7 @@ class PathsData(object):
         def append_path(rendom_path, path_idx, hero_id, investigated_point_idx, path_advance):
             if len(random_path) and random_path[0][0] != random_path[-1][0] and random_path[0][1] != random_path[-1][1]:
                 refering_point = random_path[path_advance % self.params.SEGMENT_SIZE][0:2] # refering point is the player position in the tick
-                if investigated_point_idx >= len(random_path): investigated_point_idx = len(random_path) - 1 # edge case - path shorten than expected
+                if investigated_point_idx >= len(random_path): investigated_point_idx = len(random_path) - 1 # edge case - path shorter than expected
                 point_distance = math.hypot(random_path[investigated_point_idx][0] - refering_point[0] + player_point[0] - go_to[0],
                                             random_path[investigated_point_idx][1] - refering_point[1] + player_point[1] - go_to[1])
                 selected_paths.append([point_distance, path_idx, hero_id, refering_point, random_path, self.player_position])

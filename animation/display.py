@@ -7,7 +7,7 @@ import numpy
 import collections
 import math
 
-import paths_data
+import data
 import params
 
 # style
@@ -60,9 +60,9 @@ class Application(object):
         if not os.path.exists('dota2.csv'):
             print("ERROR: Please download and extract this file...\nhttps://github.com/aigamedev/nuclai16/releases/download/0.0/dota2.csv.bz2\n")
             sys.exit(-1)
-        self.paths_data = paths_data.PathsData('dota2.csv', self.params)
+        self.data = data.Data('dota2.csv', self.params)
         # init the searched point with some random value - after first mouse move it's a
-        self.paths_data.mouse_xy = ( ( numpy.random.rand(2) * 10 - 5 ) - numpy.asarray(self.canvas.size) / 2 ) * self.params.SCALE_FACTOR
+        self.data.mouse_xy = ( ( numpy.random.rand(2) * 10 - 5 ) - numpy.asarray(self.canvas.size) / 2 ) * self.params.SCALE_FACTOR
 
         self.grid = vispy.scene.visuals.GridLines(parent=self.view.scene, color=(1, 1, 1, 1))
         self.grid.transform = vispy.visuals.transforms.MatrixTransform()
@@ -89,7 +89,7 @@ class Application(object):
 
         @self.canvas.events.mouse_move.connect
         def on_mouse_move(event):
-            self.paths_data.mouse_xy = (numpy.asarray(self.view.camera.transform.imap(event.pos)) - numpy.asarray(self.canvas.size) / 2) * self.params.SCALE_FACTOR
+            self.data.mouse_xy = (numpy.asarray(self.view.camera.transform.imap(event.pos)) - numpy.asarray(self.canvas.size) / 2) * self.params.SCALE_FACTOR
 
 
         @self.canvas.events.draw.connect
@@ -98,32 +98,30 @@ class Application(object):
 
     def draw_current_path_advance(self, ev):
         if self.select:
-            _, new_path = self.paths_data.get_paths()
+            _, new_path = self.data.get_paths()
         else:
-            self.paths_data.advance()
+            self.data.advance()
             new_path = False
         for i in range(self.params.TOP_PATHS_NUMBER):
             if i != 0 and not self.select: continue # just advancing, no need to redraw all selection
-            if i >= len(self.paths_data.selected_paths):
+            if i >= len(self.data.selected_paths):
                 # clear and skip
                 self.lines[i].set_data(pos=numpy.asarray([[0,0],[0,0]]))
                 continue
 
-            current = self.paths_data.selected_paths[i][4]
+            current = self.data.selected_paths[i][4]
             draw_to = self.params.MOVE_ALONG_STEP_SIZE
 
             if i == 0:
-                draw_to += self.paths_data.advance_point
-                marker_point = current[self.paths_data.advance_point][0:2]
-                #marker_point = self.paths_data.selected_paths[i][3]
+                draw_to += self.data.advance_point
+                marker_point = current[self.data.advance_point][0:2]
 
             current = current[0:draw_to]
-
             self.lines[i].set_data(pos=current[:,[0,1]])
             if self.select:
                 self.lines[i].transform.reset()
-                self.lines[i].transform.translate((self.paths_data.selected_paths[i][3] * -1))
-                self.lines[i].transform.translate(self.paths_data.player_position)
+                self.lines[i].transform.translate((self.data.selected_paths[i][3] * -1))
+                self.lines[i].transform.translate(self.data.player_position)
                 # to have [0,0] in the screen center
                 self.lines[i].transform.translate(numpy.asarray(self.canvas.size) / 2)
 
@@ -135,10 +133,10 @@ class Application(object):
             # append history
             self.history[self.history_pointer].transform.reset()
             self.history[self.history_pointer].transform = vispy.visuals.transforms.MatrixTransform()
-            current = self.paths_data.previous_path[0][4][0:self.paths_data.previous_path[1]]
+            current = self.data.previous_path[0][4][0:self.data.previous_path[1]]
             self.history[self.history_pointer].set_data(current[:,[0,1]])
-            self.history[self.history_pointer].transform.translate((self.paths_data.previous_path[0][3] * -1))
-            self.history[self.history_pointer].transform.translate(self.paths_data.previous_path[0][5])
+            self.history[self.history_pointer].transform.translate((self.data.previous_path[0][3] * -1))
+            self.history[self.history_pointer].transform.translate(self.data.previous_path[0][5])
             self.history[self.history_pointer].transform.translate(numpy.asarray(self.canvas.size) / 2)
             self.history_pointer += 1
             if self.history_pointer == self.params.HISTORY_SIZE: self.history_pointer = 0
