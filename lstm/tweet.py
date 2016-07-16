@@ -52,9 +52,9 @@ def build_model(model_in=None, model_out=None):
     else:
         print('Build model...')
         model = Sequential()
-        model.add(LSTM(512, return_sequences=True, input_shape=(maxlen, len(chars))))
+        model.add(LSTM(64, return_sequences=True, input_shape=(maxlen, len(chars))))
         model.add(Dropout(0.2))
-        model.add(LSTM(512, return_sequences=False))
+        model.add(LSTM(64, return_sequences=False))
         model.add(Dropout(0.2))
         model.add(Dense(len(chars)))
         model.add(Activation('softmax'))
@@ -108,7 +108,8 @@ def train(model):
             print('-' * 50)
             print('Iteration', iteration)
 
-            model.fit(X, y, batch_size=128, nb_epoch=1)
+            idx = np.random.randint(X.shape[0], size=100000)
+            model.fit(X[idx], y[idx], batch_size=128, nb_epoch=1)
             generate_tweets(model)
 
     except KeyboardInterrupt:
