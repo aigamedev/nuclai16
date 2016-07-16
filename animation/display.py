@@ -34,6 +34,7 @@ class Application(object):
         self.widget = self.canvas.central_widget
         self.view = self.canvas.central_widget.add_view()
         self.marker = vispy.scene.Markers(pos=numpy.asarray([[0,0]]), face_color='red', size=0, parent=self.view.scene)
+        self.select = True # identify if the current tick select or advance the path
         # prepare display
         self.lines = []
         self.colors = []
@@ -96,30 +97,35 @@ class Application(object):
             pass
 
     def draw_current_path_advance(self, ev):
-
-        selected_paths, new_path = self.paths_data.get_paths()
+        if self.select:
+            _, new_path = self.paths_data.get_paths()
+        else:
+            self.paths_data.advance()
+            new_path = False
         for i in range(self.params.TOP_PATHS_NUMBER):
-            if i >= len(selected_paths):
+            if i != 0 and not self.select: continue # just advancing, no need to redraw all selection
+            if i >= len(self.paths_data.selected_paths):
                 # clear and skip
                 self.lines[i].set_data(pos=numpy.asarray([[0,0],[0,0]]))
                 continue
 
-            current = selected_paths[i][4]
+            current = self.paths_data.selected_paths[i][4]
             draw_to = self.params.MOVE_ALONG_STEP_SIZE
 
             if i == 0:
                 draw_to += self.paths_data.advance_point
-                #marker_point = current[self.paths_data.advance_point][0:2]
-                marker_point = selected_paths[i][3]
+                marker_point = current[self.paths_data.advance_point][0:2]
+                #marker_point = self.paths_data.selected_paths[i][3]
 
             current = current[0:draw_to]
 
             self.lines[i].set_data(pos=current[:,[0,1]])
-            self.lines[i].transform.reset()
-            self.lines[i].transform.translate((selected_paths[i][3] * -1))
-            self.lines[i].transform.translate(self.paths_data.player_position)
-            # to have [0,0] in the screen center
-            self.lines[i].transform.translate(numpy.asarray(self.canvas.size) / 2)
+            if self.select:
+                self.lines[i].transform.reset()
+                self.lines[i].transform.translate((self.paths_data.selected_paths[i][3] * -1))
+                self.lines[i].transform.translate(self.paths_data.player_position)
+                # to have [0,0] in the screen center
+                self.lines[i].transform.translate(numpy.asarray(self.canvas.size) / 2)
 
             if i == 0:
                 self.marker.set_data(pos=numpy.asarray([marker_point]), face_color=self.colors[i], size=15)
@@ -132,11 +138,12 @@ class Application(object):
             current = self.paths_data.previous_path[0][4][0:self.paths_data.previous_path[1]]
             self.history[self.history_pointer].set_data(current[:,[0,1]])
             self.history[self.history_pointer].transform.translate((self.paths_data.previous_path[0][3] * -1))
-            self.history[self.history_pointer].transform.translate(self.paths_data.previous_path[2])
+            self.history[self.history_pointer].transform.translate(self.paths_data.previous_path[0][5])
             self.history[self.history_pointer].transform.translate(numpy.asarray(self.canvas.size) / 2)
             self.history_pointer += 1
             if self.history_pointer == self.params.HISTORY_SIZE: self.history_pointer = 0
 
+        self.select = not self.select
 
 
     def process(self, _):
