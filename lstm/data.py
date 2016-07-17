@@ -5,7 +5,7 @@ STX = u"\2"
 ETX = u"\3"
 UNK = u"\4"
 
-def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorten=False):
+def read(filename, minlen=40, maxlen=None, trim_hash=False, shorten=False):
     all_tweets = set()
     text = ""
     with open(filename, 'r', encoding='utf8') as f:
@@ -21,9 +21,6 @@ def read(filename, minlen=40, maxlen=None, padding=None, trim_hash=False, shorte
                 tweet = tweet_shorten
             if len(tweet) < minlen: continue # not a great input - trim it
             if maxlen != None and len(tweet) > maxlen: continue # too long
-            if padding:
-                pad = '{:' + padding + '<' + str(maxlen) + '}'
-                tweet = pad.format(tweet)
             all_tweets.add(tweet)
             text += tweet
 

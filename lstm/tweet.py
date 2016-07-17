@@ -103,7 +103,7 @@ def train(model):
     # Train the model, output generated text after each iteration.
     try: 
 
-        for iteration in range(1, 50):
+        for iteration in range(1, 25):
             print()
             print('-' * 50)
             print('Iteration', iteration)
