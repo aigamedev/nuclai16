@@ -29,11 +29,13 @@ The various folders named ``style``, ``content``, ``output`` or ``frames`` are t
 
 .. code:: bash
 
-    doodle --style style/sketch4.jpg --output-size=512x512\
-           --passes 2 --layers 5 4 3 --iterations 4 3 2
+    doodle --style style/sketch4.jpg --output-size=512x512 \
+           --passes 2 --layers 5 4 3 --iterations 4 3 2 \
+           --output output/sketch4_texture.png
 
     doodle --style style/paint4.jpg --output-size=512x512 \
-           --passes 2 --layers 5 4 3 --iterations 4 3 2
+           --passes 2 --layers 5 4 3 --iterations 4 3 2 \
+           --output output/paint4_texture.png
 
 
 3. Style Transfer
@@ -43,7 +45,8 @@ The various folders named ``style``, ``content``, ``output`` or ``frames`` are t
 
     doodle --content content/Freddie.jpg --style style/charcoal1.jpg \
            -passes 2 --layers 5 4 --iterations 3 3 \
-           --variety 20 10 0 --content-weight 0.3 0.1 0.0
+           --variety 20 10 0 --content-weight 0.3 0.1 0.0 \
+           --output output/Freddie_charcoal1.png
 
 
 4. Neural Doodle
@@ -53,4 +56,5 @@ The various folders named ``style``, ``content``, ``output`` or ``frames`` are t
 
     doodle --content content/Freddie.jpg --style style/charcoal2.jpg --semantic-weight=1.0 \
            --passes 2 --layers 5 4 --iterations 3 2 \
-           --variety 100 0 --content-weight 0.1 0.0 --noise-weight 0.1 0.0
+           --variety 100 0 --content-weight 0.1 0.0 --noise-weight 0.1 0.0 \
+           --output output/Freddie_charcoal2.png
