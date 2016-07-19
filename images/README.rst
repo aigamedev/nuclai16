@@ -42,7 +42,7 @@ The various folders named ``style``, ``content``, ``output`` or ``frames`` are t
 .. code:: bash
 
     doodle --content content/Freddie.jpg --style style/charcoal1.jpg \
-           -passes 2 --layers 5 4 --iterations 3 3 \
+           --passes 2 --layers 5 4 --iterations 3 3 \
            --variety 20 10 0 --content-weight 0.3 0.1 0.0
 
 
