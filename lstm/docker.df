@@ -26,7 +26,7 @@ RUN unlink python; ln -s /opt/conda/bin/python3 /bin/python
 # Copy only required project files
 COPY data.py .
 COPY tweet.py .
-COPY seq2seq.py .
+COPY s2s.py .
 COPY reply.py .
 
 # Pre-trained network.
