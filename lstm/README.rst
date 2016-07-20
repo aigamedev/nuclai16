@@ -26,7 +26,7 @@ Using pre-trained data:
 
 Training it yourself:
 
-.. code
+.. code:: bash
 
     python tweet.py --train --save lstm64
 
