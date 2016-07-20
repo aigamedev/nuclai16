@@ -4,14 +4,20 @@ This repository contains the source code and data to participate in the workshop
 
 ## Installation & Dependencies
 
-1. **vispy —** In your virtual enviroment run `pip install -e git+https://github.com/vispy/vispy#egg=vispy-dev` to get the latest dev version.
+1. conda create -n py35 numpy
+2. conda activate
+3. pip install -e git+https://github.com/vispy/vispy#egg=vispy-dev
+4. (Windows) `Download GLFW <http://www.glfw.org/download.html>`_ and add `lib-mingw-w64` to %PATH%.
+
 
 ## Running demos
 
-This directory packes together 4 demos.
+.. code:: bash
 
-1. **name —** Type `python display.py --example=0` to run ...
-1. **name —** Type `python display.py --example=1` to run ...
-1. **name —** Type `python display.py --example=2` to run ...
-1. **name —** Type `python display.py --example=3` to run ...
+    python display_todo.py
+
+
+.. code:: bash
+
+    python display_done.py
 
